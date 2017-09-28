@@ -6,9 +6,9 @@
 
 #include "affignmain.h"
 
-// ----------------------------------------------------------------------------
+// ****************************************************************************
 // AffignApp
-// ----------------------------------------------------------------------------
+// ****************************************************************************
 
 /// Event Handler
 bool AffignApp::OnInit()
@@ -428,7 +428,7 @@ AffignConfigFrame::AffignConfigFrame(
 	// framerate selection
 	wxStaticText* fpsLabel = new wxStaticText(panel, -1, "Video frame rate");
 	fpsCtrl = new wxTextCtrl(panel, ID_CONFIG_FPS,
-		wxString::Format("%d", DEFAULT_FRAMERATE), wxDefaultPosition, wxDefaultSize,
+		wxString::Format("%d", AFFIGN_DEFAULT_FRAMERATE), wxDefaultPosition, wxDefaultSize,
 		0, wxTextValidator(wxFILTER_DIGITS));
 
 	// root name selection
@@ -829,7 +829,7 @@ void AffignDlg::OnOK(wxCommandEvent& WXUNUSED(event))
 
 AffignConfig::AffignConfig()
 {
-	frameRate = DEFAULT_FRAMERATE;
+	frameRate = AFFIGN_DEFAULT_FRAMERATE;
 	video = false;
 	imgExtension = bmp;
 	vidRoot = "default";
