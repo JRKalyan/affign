@@ -79,7 +79,6 @@ enum extType {
 };
 
 namespace {
-
 	const wxSize AFFIGN_MAIN_SIZE(480, 320);
 	const wxSize AFFIGN_DLG_SIZE(300, 150);
 	const wxSize AFFIGN_CONFIG_SIZE(400, 270);
@@ -90,7 +89,7 @@ namespace {
 	const wxColour AFFIGN_BLUE(0, 0, 180);
 	const wxColour AFFIGN_GREEN(0, 180, 0);
 
-	const int DEFAULT_FRAMERATE = 30;
+	const int AFFIGN_DEFAULT_FRAMERATE = 30;
 
 }
 
