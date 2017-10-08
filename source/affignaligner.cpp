@@ -115,7 +115,7 @@ void AffignAligner::AddVideo(const char* videoPath, int fps)
 	std::string strVideoPath = videoPath;
 	vwriter = cv::VideoWriter(
 		strVideoPath,
-		cv::VideoWriter::fourcc('I', '4', '2', '0'),
+		-1,
 		fps,
 		referenceSize);
 }

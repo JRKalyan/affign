@@ -419,14 +419,14 @@ AffignConfigFrame::AffignConfigFrame(
 	choices.Add(".png");
 	choices.Add(".tiff");
 
-	wxStaticText* extLabel = new wxStaticText(panel, -1, "Image Sequence file extension");
+	wxStaticText* extLabel = new wxStaticText(panel, -1, "Image Sequence File Extension");
 	wxChoice* extChoice = new wxChoice(panel, ID_CONFIG_EXT, wxPoint(-1, -1),
 		wxSize(-1, -1), choices);
 
 	extChoice->SetSelection(bmp);
 
 	// framerate selection
-	wxStaticText* fpsLabel = new wxStaticText(panel, -1, "Video frame rate");
+	wxStaticText* fpsLabel = new wxStaticText(panel, -1, "Video Frame Rate");
 	fpsCtrl = new wxTextCtrl(panel, ID_CONFIG_FPS,
 		wxString::Format("%d", AFFIGN_DEFAULT_FRAMERATE), wxDefaultPosition, wxDefaultSize,
 		0, wxTextValidator(wxFILTER_DIGITS));
