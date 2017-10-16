@@ -789,26 +789,25 @@ AffignDlg::AffignDlg(
 	wxWindow* parent,
 	const wxString& title,
 	const wxString& text)
-	: wxFrame(parent, -1, title, wxPoint(-1, -1), wxSize(300, 150))
+	: wxFrame(parent, -1, title, wxPoint(-1, -1), AFFIGN_DLG_SIZE,
+		wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX))
 {
-
 	panel = new wxPanel(this);
 	vbox = new wxBoxSizer(wxVERTICAL);
 	hbox1 = new wxBoxSizer(wxHORIZONTAL);
 	hbox2 = new wxBoxSizer(wxHORIZONTAL);
 
 	msg = new wxStaticText(panel, -1, text);
-	hbox1->Add(msg, 1, wxALIGN_CENTER | wxALL, 10);
+	hbox1->Add(msg, 1, wxALIGN_TOP | wxALL | wxEXPAND, 10);
 
 	okBtn = new wxButton(panel, wxID_EXIT, "OK");
-	hbox2->Add(okBtn, 0, wxALIGN_RIGHT | wxRIGHT | wxBOTTOM | wxLEFT, 10);
+	hbox2->Add(okBtn, 0, wxRIGHT | wxBOTTOM | wxLEFT, 10);
 
-	vbox->Add(hbox1, 1, wxALIGN_CENTER);
-	vbox->Add(hbox2, 0, wxALIGN_RIGHT);
+	vbox->Add(hbox1, 1, wxALIGN_CENTER, 0);
+	vbox->Add(hbox2, 0, wxALIGN_RIGHT, 0);
 
 	panel->SetSizer(vbox);
 
-	this->SetMinSize(wxSize(300, 150));
 	Center();
 }
 

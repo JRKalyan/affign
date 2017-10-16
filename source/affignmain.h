@@ -63,11 +63,11 @@ enum
 
 /// Styles for messages given to log display
 enum logStyle {
-	message, // eg attempting to align
+	message, // eg attempting to align an image
 	response, // eg user clicks stop
 	warning, // eg failed to align certain image
 	error, // eg reference failed to be set, fatal to process
-	success // eg  complete aligner initialization
+	success // eg complete aligner initialization
 };
 
 /// Extensions for image sequence
