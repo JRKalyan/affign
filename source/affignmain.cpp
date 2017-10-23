@@ -557,10 +557,8 @@ void AffignConfigFrame::OnIdle(wxIdleEvent& WXUNUSED(event))
 // Constructor ----------------------------------------------------------------
 
 AffignThread::AffignThread(AffignMainFrame* framePtr, AffignConfig conf)
-	: wxThread(wxTHREAD_DETACHED)
+	: wxThread(wxTHREAD_DETACHED), handler(framePtr), threadConfig(conf)
 {
-	handler = framePtr;
-	threadConfig = conf;
 }
 
 // Methods --------------------------------------------------------------------
@@ -581,13 +579,21 @@ wxThread::ExitCode AffignThread::Entry()
 		try
 		{
 			handler->imageAligner = new AffignAligner();
+			SendMsg("Initialization Complete", success);
 		}
 		catch (std::exception const& e)
 		{
 			SendMsg(e.what(), error);
+			UpdateProgress("Progress: Complete");
+			wxQueueEvent(handler, new wxThreadEvent(wxEVT_THREAD, ID_THREAD_COMPLETE));
 			return (wxThread::ExitCode)(-1);
 		}
-		SendMsg("Initialization Complete", success);
+	}
+
+	if (!TestDestroy()) {
+		UpdateProgress("Progress: Complete");
+		wxQueueEvent(handler, new wxThreadEvent(wxEVT_THREAD, ID_THREAD_COMPLETE));
+		return (wxThread::ExitCode)(0);
 	}
 
 	try
@@ -597,6 +603,8 @@ wxThread::ExitCode AffignThread::Entry()
 	catch (std::exception const& e)
 	{
 		SendMsg(e.what(), error);
+		UpdateProgress("Progress: Complete");
+		wxQueueEvent(handler, new wxThreadEvent(wxEVT_THREAD, ID_THREAD_COMPLETE));
 		return (wxThread::ExitCode)(-1);
 	}
 	SendMsg("Reference successfully set", success);
@@ -716,9 +724,7 @@ wxThread::ExitCode AffignThread::Entry()
 	logFile.Close();
 
 	UpdateProgress("Progress: Complete");
-
 	wxQueueEvent(handler, new wxThreadEvent(wxEVT_THREAD, ID_THREAD_COMPLETE));
-
 	return (wxThread::ExitCode)0;
 }
 
