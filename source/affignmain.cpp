@@ -323,6 +323,7 @@ void AffignMainFrame::CreateDialog(const wxString& text, logStyle style)
 		dlgTitle = "Warning";
 		break;
 	case error:
+		wxBell();
 		dlgTitle = "Error";
 		break;
 	case success:
