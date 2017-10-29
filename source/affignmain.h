@@ -44,6 +44,7 @@ enum
 	ID_PROCESS,
 	ID_CONFIGURE,
 	ID_STOP,
+	ID_LICENSE,
 
 	// configuration frame IDs
 	ID_CONFIG_OK,
@@ -78,20 +79,41 @@ enum extType {
 	tiff
 };
 
+/// Constants
 namespace {
 	const wxSize AFFIGN_MAIN_SIZE(480, 320);
-	const wxSize AFFIGN_DLG_SIZE(300, 150);
+	const wxSize AFFIGN_DLG_SIZE(400, 150);
+	const wxSize AFFIGN_DLG_SIZE_LARGE(560, 350);
 	const wxSize AFFIGN_CONFIG_SIZE(400, 270);
 
-	const wxColour AFFIGN_BLACK(0, 0, 0);
-	const wxColour AFFIGN_RED(180, 0, 0);
+	const wxColour AFFIGN_BLACK(0, 0, 0);	const wxColour AFFIGN_RED(180, 0, 0);
 	const wxColour AFFIGN_ORANGE(255, 140, 0);
 	const wxColour AFFIGN_BLUE(0, 0, 180);
 	const wxColour AFFIGN_GREEN(0, 180, 0);
 
 	const int AFFIGN_DEFAULT_FRAMERATE = 30;
 
+	const wxString progressComplete("Progress: Complete");
+	const wxString progressNA("Progress: N/A");
+	
+	const char* licenseMIT =
+#include "licenseMIT.txt"
+		;
+
+	const char* licenseOPENCV =
+#include "licenseOPENCV.txt"
+		;
+
+	const char* licenseDLIB =
+#include "licenseDLIB.txt"
+		;
+
+	const char* licenseWX =
+#include "licenseWX.txt"
+		;
+
 }
+
 
 // ****************************************************************************
 // Classes
@@ -131,6 +153,7 @@ public:
 
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void OnLicense(wxCommandEvent& event);
 	void OnDirSelect(wxCommandEvent& event);
 	void OnConfigure(wxCommandEvent& event);
 	void OnConfigureOk(wxCommandEvent& event);
@@ -169,6 +192,7 @@ protected:
 	void InputCheck(const wxString& input, const  wxString& output);
 	void StopAlignerThread();
 	void CreateDialog(const wxString& text, logStyle style);
+	void CreateDialog(const wxString& text, const wxString& title, bool large = false);
 	void SetConfig(AffignConfig& conf);
 
 	wxDECLARE_EVENT_TABLE();
@@ -230,7 +254,8 @@ class AffignDlg : public wxFrame
 {
 public:
 
-	AffignDlg(wxWindow* parent, const wxString& title, const wxString& text);
+	AffignDlg(wxWindow* parent, const wxString& title, const wxString& text,
+		bool large = false);
 
 	void OnOK(wxCommandEvent& event);
 
@@ -242,7 +267,6 @@ protected:
 	wxBoxSizer* hbox2;
 
 	wxButton* okBtn;
-	wxStaticText* msg;
 
 	wxDECLARE_EVENT_TABLE();
 };
@@ -256,6 +280,7 @@ protected:
 wxBEGIN_EVENT_TABLE(AffignMainFrame, wxFrame)
 EVT_MENU(wxID_EXIT, AffignMainFrame::OnQuit)
 EVT_MENU(wxID_ABOUT, AffignMainFrame::OnAbout)
+EVT_MENU(ID_LICENSE, AffignMainFrame::OnLicense)
 EVT_BUTTON(ID_INPUT_SELECT, AffignMainFrame::OnDirSelect)
 EVT_BUTTON(ID_OUTPUT_SELECT, AffignMainFrame::OnDirSelect)
 EVT_BUTTON(ID_CONFIGURE, AffignMainFrame::OnConfigure)

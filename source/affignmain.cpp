@@ -37,13 +37,11 @@ AffignMainFrame::AffignMainFrame(const wxString& title)
 
     // Menubar
     wxMenu *fileMenu = new wxMenu;
+	fileMenu->Append(wxID_EXIT, "E&xit\tAlt-X", "Quit this program");
 
     wxMenu *helpMenu = new wxMenu;
-    helpMenu->Append(wxID_ABOUT, "&About\tF2", "Show about dialog");
-
-	fileMenu->Append(wxID_ANY, "&Test\tAlt-T", "Get lit yo!");
-	fileMenu->AppendSeparator();
-    fileMenu->Append(wxID_EXIT, "E&xit\tAlt-X", "Quit this program");
+	helpMenu->Append(wxID_ABOUT, "&About\tAlt-A", "Show about dialog");
+	helpMenu->Append(ID_LICENSE, "&Licensing\tAlt-L", "Licensing information");
 	
     wxMenuBar *menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
@@ -82,7 +80,7 @@ AffignMainFrame::AffignMainFrame(const wxString& title)
 
 	// Progress Text
 
-	progressText = new wxStaticText(panel, wxID_ANY, "Progress: N/A");
+	progressText = new wxStaticText(panel, wxID_ANY, progressNA);
 
 	// text display
 
@@ -132,23 +130,69 @@ void AffignMainFrame::OnClose(wxCloseEvent& WXUNUSED(event))
 		if (!alignerThread) break;
 		wxThread::This()->Sleep(1);
 	}
-
 	delete imageAligner;
-
 	Destroy();
 }
 
-/// displays informative message
+
+/// displays informative message about affign
 void AffignMainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxMessageBox("Welcome to the Affign Photo Aligner.\n"
-		         "\n"
-		         "Affign uses face detection and landmarking "
-			     "to automatically align images based on face "
-		         "position for photo-a-day projects.",
-                 "About Affign",
-                 wxOK | wxICON_INFORMATION,
-                 this);
+
+    CreateDialog(
+		"Welcome to the Affign Photo Aligner.\n"
+		"\n"
+		"Affign uses face detection and landmarking "
+		"to automatically align images based on face "
+		"position for photo-a-day projects."
+		"\n"
+		"\n"
+		"This software is licensed under the MIT license "
+		"however it is linked to the following libraries "
+		"which are licensed under their own terms. As "
+		"per some of those conditions, their licenses "
+		"are presented in the licensing section under \"Help\"."
+		"\n"
+		"\n"
+		"OpenCV (3-Clause BSD-License)"
+		"\n"
+		"Dlib (Boost Software License)"
+		"\n"
+		"wxWidgets (wxWindows Library Licence)",
+		"About Affign",
+	     true
+	);
+}
+
+/// shows licensing information
+void AffignMainFrame::OnLicense(wxCommandEvent& WXUNUSED(event)) {
+	wxString licenseText;
+	wxString sep(
+		"----------------------------------------"
+		"----------------------------------------\n"
+	);
+
+	licenseText += "This software is licensed under it's own license, and "
+		"it depends on other libraries with their own licenses.\n\n";
+
+	licenseText += sep;
+	licenseText += "Affign's License (MIT License)\n";
+	licenseText += sep + "\n";
+	licenseText += licenseMIT;
+	licenseText += "\n\n";
+
+	licenseText += sep;
+	licenseText += "OpenCV's License (3-Clause BSD License)\n";
+	licenseText += sep + "\n";
+	licenseText += licenseOPENCV;
+	licenseText += "\n\n";
+	
+	licenseText += sep;
+	licenseText += "Dlib's License (Boost Software License)\n";
+	licenseText += sep + "\n";
+	licenseText += licenseDLIB;
+
+	CreateDialog(licenseText, "Licensing information",true);
 }
 
 /// sets the directory with path separator when browse is pressed
@@ -332,6 +376,14 @@ void AffignMainFrame::CreateDialog(const wxString& text, logStyle style)
 	}
 
 	AffignDlg* dialog = new AffignDlg(this, dlgTitle, text);
+	dialog->Show();
+}
+
+/// Creates a dialog with a given title / and with optional large option
+void AffignMainFrame::CreateDialog(const wxString& text, 
+	const wxString& title,
+	bool large) {
+	AffignDlg* dialog = new AffignDlg(this, title, text, large);
 	dialog->Show();
 }
 
@@ -584,14 +636,14 @@ wxThread::ExitCode AffignThread::Entry()
 		catch (std::exception const& e)
 		{
 			SendMsg(e.what(), error);
-			UpdateProgress("Progress: Complete");
+			UpdateProgress(progressComplete);
 			wxQueueEvent(handler, new wxThreadEvent(wxEVT_THREAD, ID_THREAD_COMPLETE));
 			return (wxThread::ExitCode)(-1);
 		}
 	}
 
-	if (!TestDestroy()) {
-		UpdateProgress("Progress: Complete");
+	if (TestDestroy()) {
+		UpdateProgress(progressComplete);
 		wxQueueEvent(handler, new wxThreadEvent(wxEVT_THREAD, ID_THREAD_COMPLETE));
 		return (wxThread::ExitCode)(0);
 	}
@@ -603,7 +655,7 @@ wxThread::ExitCode AffignThread::Entry()
 	catch (std::exception const& e)
 	{
 		SendMsg(e.what(), error);
-		UpdateProgress("Progress: Complete");
+		UpdateProgress(progressComplete);
 		wxQueueEvent(handler, new wxThreadEvent(wxEVT_THREAD, ID_THREAD_COMPLETE));
 		return (wxThread::ExitCode)(-1);
 	}
@@ -723,7 +775,7 @@ wxThread::ExitCode AffignThread::Entry()
 	logFile.Write();
 	logFile.Close();
 
-	UpdateProgress("Progress: Complete");
+	UpdateProgress(progressComplete);
 	wxQueueEvent(handler, new wxThreadEvent(wxEVT_THREAD, ID_THREAD_COMPLETE));
 	return (wxThread::ExitCode)0;
 }
@@ -744,7 +796,7 @@ void AffignThread::ReferenceCheck(const wxArrayString& files)
 		catch (std::exception& e)
 		{
 			wxString whatMsg = e.what();
-			SendMsg("reference could not be set: " + whatMsg, warning);
+			SendMsg("Reference could not be set: " + whatMsg, warning);
 		}
 	}
 
@@ -795,25 +847,39 @@ AffignThread::~AffignThread()
 AffignDlg::AffignDlg(
 	wxWindow* parent,
 	const wxString& title,
-	const wxString& text)
-	: wxFrame(parent, -1, title, wxPoint(-1, -1), AFFIGN_DLG_SIZE,
-		wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX))
+	const wxString& text,
+	bool large)
+	: wxFrame(parent, -1, title, wxPoint(-1, -1), AFFIGN_DLG_SIZE)
 {
 	panel = new wxPanel(this);
 	vbox = new wxBoxSizer(wxVERTICAL);
 	hbox1 = new wxBoxSizer(wxHORIZONTAL);
 	hbox2 = new wxBoxSizer(wxHORIZONTAL);
 
-	msg = new wxStaticText(panel, -1, text);
-	hbox1->Add(msg, 1, wxALIGN_TOP | wxALL | wxEXPAND, 10);
-
+	if (!large) {
+		wxStaticText* msg = new wxStaticText(panel, -1, text);
+		hbox1->Add(msg, 1, wxALIGN_TOP | wxALL | wxEXPAND, 10);
+	}
+	else {
+		wxTextCtrl* ctrlMsg = new wxTextCtrl(panel, -1, text, wxDefaultPosition,
+			wxDefaultSize, wxTE_READONLY | wxTE_MULTILINE);
+		hbox1->Add(ctrlMsg, 1, wxALL | wxEXPAND, 10);
+	}
+	
 	okBtn = new wxButton(panel, wxID_EXIT, "OK");
 	hbox2->Add(okBtn, 0, wxRIGHT | wxBOTTOM | wxLEFT, 10);
-
-	vbox->Add(hbox1, 1, wxALIGN_CENTER, 0);
+	
+	vbox->Add(hbox1, 1, wxALIGN_CENTER | wxEXPAND, 0);
 	vbox->Add(hbox2, 0, wxALIGN_RIGHT, 0);
 
 	panel->SetSizer(vbox);
+	if (large) {
+		SetSize(AFFIGN_DLG_SIZE_LARGE);
+		SetMinSize(AFFIGN_DLG_SIZE_LARGE);
+	}
+	else {
+		SetMinSize(AFFIGN_DLG_SIZE);
+	}
 
 	Center();
 }
