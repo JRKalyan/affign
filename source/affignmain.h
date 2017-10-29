@@ -108,10 +108,6 @@ namespace {
 #include "licenseDLIB.txt"
 		;
 
-	const char* licenseWX =
-#include "licenseWX.txt"
-		;
-
 }
 
 
