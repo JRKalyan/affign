@@ -11,4 +11,4 @@ This project is licensed under the [MIT License](LICENSE).
 This project relies on the following open source dependencies, which have their own respective licenses:  
   * **OpenCV** under the [3-Clause BSD License](https://opencv.org/license.html)  
   * **Dlib** under the [Boost Software License](http://dlib.net/license.html)  
-  * **wxWidgets** under the [wxWindows Library License](http://docs.wxwidgets.org/3.1/page_copyright_wxlicense.html)
+  * **wxWidgets** under the [wxWindows Library Licence](http://docs.wxwidgets.org/3.1/page_copyright_wxlicense.html)
