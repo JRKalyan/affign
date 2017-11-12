@@ -24,10 +24,6 @@
 #include "wx/filename.h"
 #include "wx/textfile.h"
 
-#ifndef wxHAS_IMAGES_IN_RESOURCES
-#include "../sample.xpm"
-#endif
-
 #include "affignaligner.h"
 #include "affignexcept.h"
 

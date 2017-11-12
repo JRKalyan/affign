@@ -17,6 +17,7 @@ bool AffignApp::OnInit()
 		return false;
 
 	AffignMainFrame *frame = new AffignMainFrame("Affign");
+	frame->SetIcon(wxICON(AAAA));
 	frame->Show(true);
 
 	return true;
