@@ -5,6 +5,7 @@
 /// License: MIT License
 
 #include "affignmain.h"
+#include "affignlogo.xpm"
 
 // ****************************************************************************
 // AffignApp
@@ -13,11 +14,11 @@
 /// Event Handler
 bool AffignApp::OnInit()
 {
-	if (!wxApp::OnInit())
-		return false;
+	if (!wxApp::OnInit()) return false;
 
 	AffignMainFrame *frame = new AffignMainFrame("Affign");
-	frame->SetIcon(wxICON(AAAA));
+	wxIcon icon(affignlogo_xpm);
+	frame->SetIcon(icon);
 	frame->Show(true);
 
 	return true;

@@ -1,0 +1,3 @@
+[submodule "source/external/dlib"]
+	path = source/external/dlib
+	url = https://github.com/davisking/dlib.git
