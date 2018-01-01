@@ -44,7 +44,7 @@ private:
 	std::vector<cv::Point> Landmarks(cv::Mat& matImage, int faceIndex = 0);
 
 	// constants
-	const std::string predictorPath = "../predictor.dat";
+	const std::string predictorPath = "predictor.dat";
 	const int leftEyeIndex = 39;
 	const int rightEyeIndex = 42;
 };
