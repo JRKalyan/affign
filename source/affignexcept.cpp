@@ -13,7 +13,7 @@ AffignException::AffignException(const char* text) : msg(text) {};
 // Methods --------------------------------------------------------------------
 
 /// returns message of exception
-const char* AffignException::what() const 
+const char* AffignException::what() const noexcept
 {
 	return msg;
 }

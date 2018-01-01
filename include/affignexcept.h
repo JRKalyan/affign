@@ -12,7 +12,7 @@ class AffignException : public std::exception
 {
 public:
 	AffignException(const char* text);
-	const char* what() const;
+	const char* what() const noexcept;
 private:
 	AffignException();
 	const char* msg;

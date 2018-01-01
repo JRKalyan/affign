@@ -109,7 +109,6 @@ AffignMainFrame::AffignMainFrame(const wxString& title)
 
 	panel->SetSizer(vbox);
 
-	SetIcon(wxICON(sample));
 	SetMinSize(wxSize(480, 320));
 	Centre();
 }
@@ -209,14 +208,13 @@ void AffignMainFrame::OnDirSelect(wxCommandEvent& event)
 		return;
 	}
 
-
-	wxDirDialog dirDlg = new wxDirDialog(this);
-	if (dirDlg.ShowModal() != wxID_OK)
+	wxDirDialog* dirDlg = new wxDirDialog(this);
+	if (dirDlg->ShowModal() != wxID_OK)
 	{
 		return;
 	}
 
-	wxFileName pathFileName = wxFileName::DirName(dirDlg.GetPath());
+	wxFileName pathFileName = wxFileName::DirName(dirDlg->GetPath());
 	wxString path = pathFileName.GetPathWithSep();
 	wxString dirName = wxEmptyString;
 
