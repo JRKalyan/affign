@@ -663,7 +663,7 @@ wxThread::ExitCode AffignThread::Entry()
 
 	wxString vidRoot = threadConfig.vidRoot;
 	wxString videoOutputName = threadConfig.outputDir + vidRoot;
-	wxString nameExt;
+	wxString nameExt = ".jpg";
 	int numFiles = files.GetCount();
 
 	if (threadConfig.video) {
@@ -699,7 +699,7 @@ wxThread::ExitCode AffignThread::Entry()
 		if (!threadConfig.video)
 		{
 			wxFileName inputName(imagePath);
-			imageOutputTemp = threadConfig.outputDir + inputName.GetName() + nameExt;
+			imageOutputTemp = threadConfig.outputDir + inputName.GetName() + "_aligned" + nameExt;
 			imageOutputName = imageOutputTemp.c_str();
 		}
 		else
