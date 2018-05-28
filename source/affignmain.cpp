@@ -856,20 +856,14 @@ AffignDlg::AffignDlg(
 	hbox1 = new wxBoxSizer(wxHORIZONTAL);
 	hbox2 = new wxBoxSizer(wxHORIZONTAL);
 
-	if (!large) {
-		wxStaticText* msg = new wxStaticText(panel, -1, text);
-		hbox1->Add(msg, 1, wxALIGN_TOP | wxALL | wxEXPAND, 10);
-	}
-	else {
-		wxTextCtrl* ctrlMsg = new wxTextCtrl(panel, -1, text, wxDefaultPosition,
-			wxDefaultSize, wxTE_READONLY | wxTE_MULTILINE);
-		hbox1->Add(ctrlMsg, 1, wxALL | wxEXPAND, 10);
-	}
+	wxTextCtrl* ctrlMsg = new wxTextCtrl(panel, -1, text, wxDefaultPosition,
+		wxDefaultSize, wxTE_READONLY | wxTE_MULTILINE);
+	hbox1->Add(ctrlMsg, 1, wxALL | wxEXPAND, 10);
 	
 	okBtn = new wxButton(panel, wxID_EXIT, "OK");
 	hbox2->Add(okBtn, 0, wxRIGHT | wxBOTTOM | wxLEFT, 10);
 	
-	vbox->Add(hbox1, 1, wxALIGN_CENTER | wxEXPAND, 0);
+	vbox->Add(hbox1, 1, wxEXPAND, 0);
 	vbox->Add(hbox2, 0, wxALIGN_RIGHT, 0);
 
 	panel->SetSizer(vbox);
