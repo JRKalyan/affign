@@ -77,10 +77,11 @@ enum extType {
 
 /// Constants
 namespace {
-	const wxSize AFFIGN_MAIN_SIZE(480, 320);
 	const wxSize AFFIGN_DLG_SIZE(400, 150);
 	const wxSize AFFIGN_DLG_SIZE_LARGE(560, 350);
 	const wxSize AFFIGN_CONFIG_SIZE(400, 270);
+	const wxSize AFFIGN_LOGTEXT_SIZE(200, 200);
+	const wxSize AFFIGN_DIRTEXT_SIZE(250, -1);
 
 	const wxColour AFFIGN_BLACK(0, 0, 0);	const wxColour AFFIGN_RED(180, 0, 0);
 	const wxColour AFFIGN_ORANGE(255, 140, 0);

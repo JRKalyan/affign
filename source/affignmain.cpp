@@ -32,7 +32,7 @@ bool AffignApp::OnInit()
 // Constructor ----------------------------------------------------------------
 
 AffignMainFrame::AffignMainFrame(const wxString& title)
-       : wxFrame(NULL, wxID_ANY, title, wxPoint(-1, -1), wxSize(480, 320))
+       : wxFrame(NULL, wxID_ANY, title, wxPoint(-1, -1), wxSize(-1, -1))
 {
 
 	alignerThread = NULL;
@@ -67,9 +67,9 @@ AffignMainFrame::AffignMainFrame(const wxString& title)
 	wxStaticText* outputDirLabel = new wxStaticText(panel, -1, "Output Directory:");
 
 	inputDirDisplay = new wxTextCtrl(panel, -1, wxEmptyString, wxPoint(-1, -1),
-		wxSize(-1, -1), wxTE_READONLY);
+		AFFIGN_DIRTEXT_SIZE, wxTE_READONLY);
 	outputDirDisplay = new wxTextCtrl(panel, -1, wxEmptyString, wxPoint(-1, -1),
-		wxSize(-1, -1), wxTE_READONLY);
+		AFFIGN_DIRTEXT_SIZE, wxTE_READONLY);
 	
 	wxButton* inputDirBtn = new wxButton(panel, ID_INPUT_SELECT, "Browse");
 	wxButton* outputDirBtn = new wxButton(panel, ID_OUTPUT_SELECT, "Browse");
@@ -87,7 +87,7 @@ AffignMainFrame::AffignMainFrame(const wxString& title)
 	// text display
 
 	logDisplay = new wxTextCtrl(panel, -1, wxEmptyString, wxPoint(-1, -1),
-		wxSize(-1, -1), wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
+		AFFIGN_LOGTEXT_SIZE, wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
 
 
 	directoryGrid->Add(inputDirLabel);
@@ -107,10 +107,10 @@ AffignMainFrame::AffignMainFrame(const wxString& title)
 	vbox->Add(progressText, 0, wxALIGN_LEFT | wxLEFT, 10);
 	vbox->Add(logDisplay, 1, wxTOP | wxEXPAND, 5);
 
-	panel->SetSizer(vbox);
-
-	SetMinSize(wxSize(480, 320));
+	panel->SetSizerAndFit(vbox);
 	Centre();
+	Fit();
+	SetMinSize(GetBestSize());
 }
 
 // Event Handlers -------------------------------------------------------------
@@ -435,7 +435,7 @@ void AffignMainFrame::InputCheck(
 AffignConfigFrame::AffignConfigFrame(
 	wxWindow* parent, 
 	const wxString& title)
-	: wxFrame(parent, -1, title, wxPoint(-1, -1), AFFIGN_CONFIG_SIZE,
+	: wxFrame(parent, -1, title, wxPoint(-1, -1), wxSize(-1, -1),
 		wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX))
 {
 	processFps = false;
@@ -450,7 +450,7 @@ AffignConfigFrame::AffignConfigFrame(
 		panel,
 		"Output Type");
 
-	wxFlexGridSizer* fbox = new wxFlexGridSizer(2, 2, 10, 10);
+	wxFlexGridSizer* fbox = new wxFlexGridSizer(3, 2, 10, 10);
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 
 
@@ -511,8 +511,8 @@ AffignConfigFrame::AffignConfigFrame(
 	vbox->Add(fbox, 0, wxEXPAND | wxLEFT | wxRIGHT, 10);
 	vbox->Add(hbox, 1, wxALIGN_RIGHT | wxALL, 10);
 
-	panel->SetSizer(vbox);
-	SetMinSize(AFFIGN_CONFIG_SIZE);
+	panel->SetSizerAndFit(vbox);
+	Fit();
 }
 
 // Event Handlers -------------------------------------------------------------
