@@ -4,137 +4,49 @@
 /// Copyright: (c) 2017 John Kalyan
 /// License: MIT License
 
-#include "affignmain.h"
-#include "affignlogo.xpm"
+#include "consolelogger.h"
+#include "commandparser.h"
+#include "mediamaker.h"
 
-// ****************************************************************************
-// AffignApp
-// ****************************************************************************
-
-/// Event Handler
-bool AffignApp::OnInit()
-{
-	if (!wxApp::OnInit()) return false;
-
-	AffignMainFrame *frame = new AffignMainFrame("Affign");
-	wxIcon icon(affignlogo_xpm);
-	frame->SetIcon(icon);
-	frame->Show(true);
-
-	return true;
+int main(int argc, char** argv) {
+  // turns out this is reached, so I need to find out what the issue it
+  std::shared_ptr<Logger> logger(new ConsoleLogger());
+  CommandParser commandparser(argc, argv);
+  try
+  {
+    commandparser.ParseArguments();
+  }
+  catch (std::exception& e)
+  {
+    logger->Log(e.what(), MessageType::error);
+    return -1;
+  }
+  if (commandparser.config.help)
+  {
+    // TODO
+    return 0;
+  }
+  if (commandparser.config.version)
+  {
+    // TODO
+    return 0;
+  }
+  if (commandparser.config.silent) {
+    // TODO - ensure that a silent logger is passed in
+    // store a pointer to the logger.
+    // in media maker make sure the logger is a shared pointer (so it can
+    // or ensure that it is initialized on the stack
+    // (like in this function)
+    // but then I need to initialize all loggers not inside scoped if statements
+    // so I think I can just have a shared ptr and pass that as an arg to constructor
+    // of media maker
+    // ok we set logger to a different thing here 
+  }
+  // here is where I should report on directory iterator failing
+  MediaMaker maker(commandparser.config.alignerconfig, logger);
+  maker.Make();
 }
-
-
-// ****************************************************************************
-// AffignMainFrame
-// ****************************************************************************
-
-// Constructor ----------------------------------------------------------------
-
-AffignMainFrame::AffignMainFrame(const wxString& title)
-       : wxFrame(NULL, wxID_ANY, title, wxPoint(-1, -1), wxSize(-1, -1))
-{
-
-	alignerThread = NULL;
-
-    // Menubar
-    wxMenu *fileMenu = new wxMenu;
-	fileMenu->Append(wxID_EXIT, "E&xit\tAlt-X", "Quit this program");
-
-    wxMenu *helpMenu = new wxMenu;
-	helpMenu->Append(wxID_ABOUT, "&About\tAlt-A", "Show about dialog");
-	helpMenu->Append(ID_LICENSE, "&Licensing\tAlt-L", "Licensing information");
-	
-    wxMenuBar *menuBar = new wxMenuBar();
-    menuBar->Append(fileMenu, "&File");
-    menuBar->Append(helpMenu, "&Help");
-
-    SetMenuBar(menuBar);
-	
-	// Sizers
-
-	wxPanel* panel = new wxPanel(this, -1);
-
-	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-
-	wxFlexGridSizer* directoryGrid = new wxFlexGridSizer(2, 3, 9, 10);
-
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-
-	// flex sizer items (directories)
-
-	wxStaticText* inputDirLabel = new wxStaticText(panel, -1, "Input Directory:");
-	wxStaticText* outputDirLabel = new wxStaticText(panel, -1, "Output Directory:");
-
-	inputDirDisplay = new wxTextCtrl(panel, -1, wxEmptyString, wxPoint(-1, -1),
-		AFFIGN_DIRTEXT_SIZE, wxTE_READONLY);
-	outputDirDisplay = new wxTextCtrl(panel, -1, wxEmptyString, wxPoint(-1, -1),
-		AFFIGN_DIRTEXT_SIZE, wxTE_READONLY);
-	
-	wxButton* inputDirBtn = new wxButton(panel, ID_INPUT_SELECT, "Browse");
-	wxButton* outputDirBtn = new wxButton(panel, ID_OUTPUT_SELECT, "Browse");
-	
-	// process and configure items
-
-	wxButton* processBtn = new wxButton(panel, ID_PROCESS, "Process");
-	wxButton* configureBtn = new wxButton(panel, ID_CONFIGURE, "Configure");
-	wxButton* stopBtn = new wxButton(panel, ID_STOP, "Stop");
-
-	// Progress Text
-
-	progressText = new wxStaticText(panel, wxID_ANY, progressNA);
-
-	// text display
-
-	logDisplay = new wxTextCtrl(panel, -1, wxEmptyString, wxPoint(-1, -1),
-		AFFIGN_LOGTEXT_SIZE, wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
-
-
-	directoryGrid->Add(inputDirLabel);
-	directoryGrid->Add(inputDirDisplay, 1, wxEXPAND);
-	directoryGrid->Add(inputDirBtn);
-	directoryGrid->Add(outputDirLabel);
-	directoryGrid->Add(outputDirDisplay, 1, wxEXPAND);
-	directoryGrid->Add(outputDirBtn);
-	directoryGrid->AddGrowableCol(1, 1);
-
-	hbox->Add(configureBtn, 0, wxRIGHT, 10);
-	hbox->Add(processBtn, 0, wxRIGHT, 10);
-	hbox->Add(stopBtn);
-
-	vbox->Add(directoryGrid, 0, wxALL | wxEXPAND, 10);
-	vbox->Add(hbox, 0, wxALL | wxALIGN_CENTER, 10);
-	vbox->Add(progressText, 0, wxALIGN_LEFT | wxLEFT, 10);
-	vbox->Add(logDisplay, 1, wxTOP | wxEXPAND, 5);
-
-	panel->SetSizerAndFit(vbox);
-	Centre();
-	Fit();
-	SetMinSize(GetBestSize());
-}
-
-// Event Handlers -------------------------------------------------------------
-
-/// generates a close event from menu quit
-void AffignMainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
-{
-    Close(true);
-}
-
-/// ensures that the thread is destroyed properly when frame closed
-void AffignMainFrame::OnClose(wxCloseEvent& WXUNUSED(event))
-{
-	StopAlignerThread();
-	while (1)
-	{
-		wxCriticalSectionLocker lock(alignerThreadCS);
-		if (!alignerThread) break;
-		wxThread::This()->Sleep(1);
-	}
-	delete imageAligner;
-	Destroy();
-}
-
+/*
 
 /// displays informative message about affign
 void AffignMainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
@@ -909,3 +821,4 @@ AffignConfig::AffignConfig()
 // ****************************************************************************
 
 wxIMPLEMENT_APP(AffignApp);
+*/

@@ -4,13 +4,32 @@
 /// Copyright: (c) 2017 John Kalyan
 /// License: MIT License
 
-#include "affignaligner.h"
+/*
+Design:
+I previously had separated the controller of the aligner into a different class
+I don't know if that is necessary, I can just have a start method
+then I have a concept of an aligner's responsibility is to produce the output media
+video aligner and image aligner could be different classes with common impls or not
+it seems cumbersome to have different classes for each option
+
+maybe just different methods.. but their functionality is the same except for write
+to video or write to file and release
+
+maybe a separate class can handle saving hte file (video saver / image saver)
+and they get initialized at the beginning, or injected into the method and implement
+an abstract interface
+
+#include "aligner.h"
 
 // Constructor ----------------------------------------------------------------
 
+void Aligner::Start() {
+}
+
 /// Initializes the face detector and landmark predictor
-AffignAligner::AffignAligner()
+Aligner::Aligner()
 {
+  // opencv equivalent
 	faceDetector = dlib::get_frontal_face_detector();
 	dlib::deserialize(predictorPath) >> shapePredictor;
 }
@@ -160,3 +179,4 @@ std::vector<cv::Point> AffignAligner::Landmarks(cv::Mat& matImg, int faceIndex)
 
 
 }
+*/
