@@ -1,7 +1,7 @@
 #include "consolelogger.h"
 #include <iostream>
 
-void ConsoleLogger::Log(std::string msg, MessageType type) {
+void ConsoleLogger::Log(const std::string& msg, MessageType type) {
   std::string prefix;
   switch (type)
   {

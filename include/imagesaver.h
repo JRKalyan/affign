@@ -4,6 +4,8 @@
 
 class ImageSaver : public MediaSaver {
 public:
-  // should probably be constructed with a directory and then pass in a filename
-  bool Save(const cv::Mat& mat) override;
+  ImageSaver(const std::string& outputdirectory, const std::string& extension);
+  void Save(const cv::Mat& mat, const std::string& name) override;
+private:
+  std::string extension;
 };

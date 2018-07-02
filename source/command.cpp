@@ -120,6 +120,10 @@ void SetModelPath(Configuration& config, const std::string& value) {
   config.alignerconfig.modelpath = value;
 }
 
+void SetDetectorPath(Configuration& config, const std::string& value) {
+  config.alignerconfig.detectorpath = value;
+}
+
 void SetVideoStem(Configuration& config, const std::string& value) {
   config.alignerconfig.videostem = value;
 }

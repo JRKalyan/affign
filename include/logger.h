@@ -11,5 +11,5 @@ enum MessageType {
 
 class Logger {
 public:
-  virtual void Log(std::string msg, MessageType type = MessageType::standard) = 0;
+  virtual void Log(const std::string& msg, MessageType type = MessageType::standard) = 0;
 };

@@ -13,14 +13,11 @@ public:
   CommandParser(int argc, char** argv);
   void ParseArguments();
   Configuration config;
-
 private:
-
   char** argv;
   int argc;
   int i = 1;
   std::list<Command> commands;
   void FillCommands();
-
 };
 

@@ -14,6 +14,7 @@ struct AlignerConfiguration {
   Extension imagetype = bmp;
   double framerate = 30;
   std::string modelpath = "predictor.yaml";
+  std::string detectorpath = "detector.xml";
   std::string videostem = "default";
   std::string inputdirectory;
   std::string outputdirectory;

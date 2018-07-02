@@ -35,25 +35,6 @@ private:
   void(*singlesetter)(Configuration&);
 };
 
-/*
-bool enabletransform = true;
-bool makevideo = false;
-bool recursive = false;
-ExtensionType imgextension = bmp;
-int framerate = 30;
-std::string modelpath = "predictor.yaml";
-std::string videostem = "default";
-std::string inputdirectory;
-std::string outputdirectory;
-help command
-version
-silent command
-*/
-
-// what if I could give matches, required etc and then a reference to a string
-// maybe I need template. they take a template T& reference to alter
-// then their constructor handles everything
-
 // Setter Functions for Commands
 // *****************************
 void SetInputDirectory(Configuration& config, const std::string& value);
@@ -65,6 +46,7 @@ void SetHelp(Configuration& config);
 void SetVersion(Configuration& config);
 void SetSilent(Configuration& config);
 void SetModelPath(Configuration& config, const std::string& value);
+void SetDetectorPath(Configuration& config, const std::string& value);
 void SetVideoStem(Configuration& config, const std::string& value);
 void SetImageType(Configuration& config, const std::string& value);
 void SetEnableTransform(Configuration& config, const std::string& value);

@@ -4,5 +4,5 @@
 
 class ConsoleLogger : public Logger {
 public:
-  void Log(std::string msg, MessageType type = MessageType::standard) override;
+  void Log(const std::string& msg, MessageType type = MessageType::standard) override;
 };

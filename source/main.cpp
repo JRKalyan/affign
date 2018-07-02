@@ -9,7 +9,6 @@
 #include "mediamaker.h"
 
 int main(int argc, char** argv) {
-  // turns out this is reached, so I need to find out what the issue it
   std::shared_ptr<Logger> logger(new ConsoleLogger());
   CommandParser commandparser(argc, argv);
   try
@@ -33,18 +32,15 @@ int main(int argc, char** argv) {
   }
   if (commandparser.config.silent) {
     // TODO - ensure that a silent logger is passed in
-    // store a pointer to the logger.
-    // in media maker make sure the logger is a shared pointer (so it can
-    // or ensure that it is initialized on the stack
-    // (like in this function)
-    // but then I need to initialize all loggers not inside scoped if statements
-    // so I think I can just have a shared ptr and pass that as an arg to constructor
-    // of media maker
-    // ok we set logger to a different thing here 
   }
-  // here is where I should report on directory iterator failing
-  MediaMaker maker(commandparser.config.alignerconfig, logger);
-  maker.Make();
+  try {
+    MediaMaker maker(commandparser.config.alignerconfig, logger);
+    maker.Make();
+  }
+  catch (std::exception& e) {
+    logger->Log(e.what(), MessageType::error);
+    return -1;
+  }
 }
 /*
 

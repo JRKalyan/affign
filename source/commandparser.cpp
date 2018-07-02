@@ -57,6 +57,7 @@ void CommandParser::FillCommands() {
     Command("--inputdirectory", "--i", true, SetInputDirectory),
     Command("--outputdirectory", "--o", true, SetOutputDirectory),
     Command("--modelpath", "--m", false, SetModelPath),
+    Command("--detectorpath", "--d", false, SetDetectorPath),
     Command("--framerate", "--f", false, SetFrameRate),
     Command("--recursive", "--r", false, SetRecursive),
     Command("--videostem", "--s", false, SetVideoStem),

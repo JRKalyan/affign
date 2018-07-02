@@ -4,6 +4,8 @@
 
 class MediaSaver {
 public:
-  // Should probably save with a filename
-  virtual bool Save(const cv::Mat& mat) = 0;
+  virtual void Save(const cv::Mat& mat, const std::string& name) = 0;
+  MediaSaver(const std::string& outputdirectory);
+protected:
+  std::string outputdirectory;
 };
