@@ -120,9 +120,9 @@ void MediaMaker::Make() {
     logger->Log("Successfully processed " + filename, MessageType::success);
   }
   logger->Log("Media Processing Complete", MessageType::standard);
-  std::stringstream failedstream;
-  failedstream << "TEMPORARY FAILED: " << data.imagesprocessed;
-  logger->Log(failedstream.str());
+  std::stringstream processedstream;
+  processedstream << "IMAGES PROCESSED: " << data.imagesprocessed;
+  logger->Log(processedstream.str());
 }
 
 /// Grabs the image data from first image to be used as the reference image
