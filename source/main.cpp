@@ -8,6 +8,8 @@
 #include "commandparser.h"
 #include "mediamaker.h"
 
+#include <iostream>
+
 int main(int argc, char** argv) {
   std::shared_ptr<Logger> logger(new ConsoleLogger());
   CommandParser commandparser(argc, argv);
@@ -22,12 +24,16 @@ int main(int argc, char** argv) {
   }
   if (commandparser.config.help)
   {
-    // TODO
+    // TODO - properly create help and version messages
+    std::cout << "Affign Help:" << std::endl;
+    std::cout << "This is a temporary message, please visit:" << std::endl;
+    std::cout << "https://github.com/JRKalyan/affign/wiki/0.2-Usage" << std::endl;
     return 0;
   }
   if (commandparser.config.version)
   {
     // TODO
+    std::cout << "Affign Version 0.2.0" << std::endl;
     return 0;
   }
   if (commandparser.config.silent) {
