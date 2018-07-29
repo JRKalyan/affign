@@ -25,9 +25,12 @@ LandmarkExtractor::LandmarkExtractor(std::string detectorpath, std::string model
 }
 
 void LandmarkExtractor::Extract(const cv::Mat& mat, ImageData& data) {
+  const int extractionwidth = 200;
   std::vector<cv::Rect> faces;
   cv::Mat grayscale;
-  cv::cvtColor(mat, grayscale, cv::COLOR_BGR2GRAY);
+  double scale = (double)extractionwidth / mat.cols;
+  cv::resize(mat, grayscale, cv::Size(), scale, scale, cv::INTER_LINEAR_EXACT);
+  cv::cvtColor(grayscale, grayscale, cv::COLOR_BGR2GRAY);
   facedetector.detectMultiScale(grayscale, faces);
   // TODO - allow option to bring up selected dialog
   if (faces.size() < 1) {
@@ -36,6 +39,17 @@ void LandmarkExtractor::Extract(const cv::Mat& mat, ImageData& data) {
   if (faces.size() > 1) {
     throw std::exception("More than one face detected");
   }
+  // Resizing the rectangle after detecting the face:
+  //  I resize after because the bulk of the time is face detection, not landmarks
+  //  Also, I tried scaling back the points after landmark detection, and the 
+  //  precision loss was more visible, but landmark detection does not care so much
+  //  about a facial bound that is slightly off.
+  auto& face = faces[0];
+  scale = 1 / scale;
+  face.x *= scale;
+  face.y *= scale;
+  face.width *= scale;
+  face.height *= scale;
   if (!landmarkdetector->fit(mat, faces, data.landmarks))
   {
     throw std::exception("Could not find landmarks on face");
