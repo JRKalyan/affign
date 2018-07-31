@@ -5,6 +5,7 @@
 #include "landmarkextractor.h"
 #include "mediasaver.h"
 #include "imagesaver.h"
+#include "videosaver.h"
 
 MediaMaker::MediaMaker(const AlignerConfiguration& config, 
   std::shared_ptr<Logger> logger)
@@ -77,7 +78,12 @@ void MediaMaker::Make() {
   std::unique_ptr<MediaSaver> saver;
   try {
     if (config.makevideo) {
-      // TODO
+      // TODO - this should actually be done after finding the reference
+      saver = std::unique_ptr<MediaSaver>(
+        new VideoSaver(config.outputdirectory,
+          config.videostem,
+          config.framerate,
+          referencedata.size));
     }
     else {
       saver = std::unique_ptr<MediaSaver>(
