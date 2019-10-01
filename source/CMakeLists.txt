@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.15)
+
+# Required for setting MSVC CRT properly (see below)
+cmake_policy(SET CMP0091 NEW)
 
 project(affign)
 
-set(RESOURCE_DIR ${CMAKE_CURRENT_SOURCEU_DIR}/../resources)
+set(RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
 set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -14,17 +17,25 @@ set(COMPILE_LIST ${SOURCE_LIST} ${HEADER_LIST} ${RESOURCE_LIST})
 
 include_directories(${HEADER_DIR})
 
-if (WIN32)
-	add_executable(${PROJECT_NAME} WIN32 ${COMPILE_LIST})
-elseif (UNIX)
-	add_executable(${PROJECT_NAME} ${COMPILE_LIST})
-elseif (APPLE)
-	add_executable(${PROJECT_NAME} ${COMPILE_LIST})
-else (WIN32)
-	add_executable(${PROJECT_NAME} ${COMPILE_LIST})
-endif (WIN32)
+add_executable(${PROJECT_NAME} ${COMPILE_LIST})
+
+# Using filesystem requires C++17
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+# Ensure when using MSVC to use statically linked CRT
+# (The generator expression will include "Debug" on debug configuration)
+set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY 
+    "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 #### External Dependencies ##########################################
+
+# NOTE: 
+# - When building OpenCV, you have to set BUILD_SHARED_LIBS to false
+#   to link statically.
+# - Point Cmake to the opencv build directory (set OpenCV_DIR)
+# - Make sure you generate for the same target platform as the OpenCV
+#   build targets
+
 find_package(OpenCV REQUIRED)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 #####################################################################

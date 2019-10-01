@@ -8,6 +8,9 @@ CommandParser::CommandParser(int argc, char** argv)
   FillCommands();
 }
 
+// TODO: take a logger and log the
+// exception messages or do that outside
+// rather than passing it via exceptions.
 void CommandParser::ParseArguments() {
   while (i < argc) {
     std::string arg(argv[i]);
@@ -44,6 +47,8 @@ void CommandParser::ParseArguments() {
     }
     ++i;
   }
+  // TODO - this needs to be fixed
+  // as in, help messages shouldn't need required args
   for (auto& command : commands) {
     if (command.isrequired && !command.parsed) {
       std::string msg = "Missing required argument: " + command.name;
@@ -52,8 +57,12 @@ void CommandParser::ParseArguments() {
   }
 }
 
+// TODO - these should be statically defined
+// just use an unnamed namespace
+// can still have the runtime struct compiled so I can do runtime checks against
+// the static data`
 void CommandParser::FillCommands() {
-  commands = std::list<Command>{
+  commands = std::vector<Command>{
     Command("--inputdirectory", "--i", true, SetInputDirectory),
     Command("--outputdirectory", "--o", true, SetOutputDirectory),
     Command("--modelpath", "--m", false, SetModelPath),
@@ -63,7 +72,7 @@ void CommandParser::FillCommands() {
     Command("--videostem", "--s", false, SetVideoStem),
     Command("--imagetype", "--t", false, SetImageType),
     Command("--enabletransform", "--et", false, SetEnableTransform),
-    Command("--makevideo", "--v", false, SetMakeVideo),
+    Command("--makevideo", "--v", false, SetMakeVideo), 
     Command("--help", "--h", SetHelp),
     Command("--silent", "--s", SetSilent),
     Command("--version", "--v", SetVersion)

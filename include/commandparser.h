@@ -3,7 +3,7 @@
 #include "configuration.h"
 #include "command.h"
 #include <exception>
-#include <list>
+#include <vector>
 #include <memory>
 
 class Command;
@@ -17,7 +17,7 @@ private:
   char** argv;
   int argc;
   int i = 1;
-  std::list<Command> commands;
+  std::vector<Command> commands;
   void FillCommands();
 };
 

@@ -9,17 +9,25 @@
 
 MediaMaker::MediaMaker(const AlignerConfiguration& config, 
   std::shared_ptr<Logger> logger)
-  : logger(logger), config(config) {
+  : m_logger(logger), m_config(config) {
   logger->Log("Initializing Media Maker");
   // populate files
   try {
     if (config.recursive) {
-      CopyFiles<fs::recursive_directory_iterator>(files,
-        fs::recursive_directory_iterator(config.inputdirectory));
+      auto directoryIterator = std::filesystem::recursive_directory_iterator(config.inputdirectory);
+      for (const std::filesystem::directory_entry& entry : directoryIterator) {
+        if (entry.exists() && entry.is_regular_file()) {
+          m_files.emplace_back(entry.path());
+        }
+      }
     }
     else {
-      CopyFiles<fs::directory_iterator>(files,
-        fs::directory_iterator(config.inputdirectory));
+      auto directoryIterator = std::filesystem::directory_iterator(config.inputdirectory);
+      for (const std::filesystem::directory_entry& entry : directoryIterator) {
+        if (entry.exists() && entry.is_regular_file()) {
+          m_files.emplace_back(entry.path());
+        }
+      }
     }
   }
   catch (std::exception& e)
@@ -28,7 +36,7 @@ MediaMaker::MediaMaker(const AlignerConfiguration& config,
       + ": " + e.what();
     throw std::exception(msg.c_str());
   }
-  if (files.size() < 1) {
+  if (m_files.size() < 1) {
     std::string msg = "There are no files in " + config.inputdirectory;
     throw std::exception(msg.c_str());
   }
@@ -36,7 +44,7 @@ MediaMaker::MediaMaker(const AlignerConfiguration& config,
   if (config.enabletransform) {
     // only add in data extractors if one or more requiring processors require it
     try {
-      extractors.emplace_back(new LandmarkExtractor(config.detectorpath, config.modelpath));
+      m_extractors.emplace_back(new LandmarkExtractor(config.detectorpath, config.modelpath));
     }
     catch (std::exception& e) {
       std::string msg("Could not create landmark extractor: ");
@@ -56,12 +64,12 @@ MediaMaker::MediaMaker(const AlignerConfiguration& config,
   }
   // create processors
   if (config.enabletransform) {
-    processors.emplace_back(new TransformProcessor());
+    m_processors.emplace_back(new TransformProcessor());
   }
   // Initialize processors from reference data
-  for (auto& processor : processors) {
+  for (auto& processor : m_processors) {
     try {
-      processor->InitializeFromReference(referencedata);
+      processor->InitializeFromReference(m_referenceData);
     }
     catch (std::exception& e) {
       std::string msg = "Could not initialize processors from the reference: ";
@@ -77,70 +85,79 @@ void MediaMaker::Make() {
   //  closing logic to destructors)
   std::unique_ptr<MediaSaver> saver;
   try {
-    if (config.makevideo) {
+    if (m_config.makevideo) {
       // TODO - this should actually be done after finding the reference
       saver = std::unique_ptr<MediaSaver>(
-        new VideoSaver(config.outputdirectory,
-          config.videostem,
-          config.framerate,
-          referencedata.size));
+        new VideoSaver(m_config.outputdirectory,
+          m_config.videostem,
+          m_config.framerate,
+          m_referenceData.size));
     }
     else {
       saver = std::unique_ptr<MediaSaver>(
-        new ImageSaver(config.outputdirectory, EXTENSION[config.imagetype]));
+        new ImageSaver(m_config.outputdirectory, EXTENSION[m_config.imagetype]));
     }
   }
   catch (std::exception& e) {
     std::string msg = "Failed to create media saver for " 
-      + config.outputdirectory + ": " + e.what();
-    logger->Log(msg, MessageType::error);
+      + m_config.outputdirectory + ": " + e.what();
+    m_logger->Log(msg, MessageType::error);
     return;
   }
   // process files
-  for (auto& file : files) {
+  for (auto& file : m_files) {
     std::string filename = file.filename().string();
     cv::String cvstringpath(file.string());
     cv::Mat current = cv::imread(cvstringpath, cv::IMREAD_COLOR);
-    data.imagedata.size = current.size();
+    m_data.imagedata.size = current.size();
     cv::Mat previous;
     if (current.empty()) {
-      logger->Log("Failed to read file: " + filename, MessageType::warning);
+      m_logger->Log("Failed to read file: " + filename, MessageType::warning);
       continue;
     }
     try {
-      for (auto& getter : extractors) {
-        getter->Extract(current, data.imagedata);
+      for (auto& getter : m_extractors) {
+        getter->Extract(current, m_data.imagedata);
       }
-      for (auto& processor : processors) {
+      for (auto& processor : m_processors) {
         previous = current;
-        processor->Process(previous, current, data);
+        processor->Process(previous, current, m_data);
       }
       saver->Save(current, file.stem().string());
-      data.imagesprocessed++;
+      m_data.imagesprocessed++;
     }
     catch (std::exception& e) {
-      logger->Log("Failed to process " + filename + ": " + e.what(), 
+      m_logger->Log("Failed to process " + filename + ": " + e.what(), 
         MessageType::warning);
       continue;
     }
-    logger->Log("Successfully processed " + filename, MessageType::success);
+    m_logger->Log("Successfully processed " + filename, MessageType::success);
   }
-  logger->Log("Media Processing Complete", MessageType::standard);
+  m_logger->Log("Media Processing Complete", MessageType::standard);
   std::stringstream processedstream;
-  processedstream << "IMAGES PROCESSED: " << data.imagesprocessed;
-  logger->Log(processedstream.str());
+  processedstream << "IMAGES PROCESSED: " << m_data.imagesprocessed;
+  m_logger->Log(processedstream.str());
 }
 
 /// Grabs the image data from first image to be used as the reference image
 /// Requires: extractors and files are populated with at least 1 file
 void MediaMaker::SetReference() {
-  cv::String path = files.begin()->string();
+  cv::String path = m_files.begin()->string();
   cv::Mat reference = cv::imread(path, cv::IMREAD_COLOR);
   if (reference.empty()) {
     throw std::exception("Could not load reference");
   }
-  for (auto& extractor : extractors) {
-    extractor->Extract(reference, referencedata);
+  for (auto& extractor : m_extractors) {
+    extractor->Extract(reference, m_referenceData);
   }
-  referencedata.size = reference.size();
+  m_referenceData.size = reference.size();
 }
+
+// TODO
+// - remove exceptions 
+// - I have a lot of useless stuff stored on the mediamaker object. I don't really think
+//   MediaMaker could just be function
+// - make commands to static data
+// - fix help text 
+//   1. it should display without requiring valid command line args that make it early out
+//   2. it should actually show help and not just link to the usage.
